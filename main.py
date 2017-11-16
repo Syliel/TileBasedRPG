@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pygame as pg
 import sys
+from pygame import sprite
 from os import path
 from settings import *
 from sprites import *
@@ -33,6 +34,7 @@ class Game:
     def new(self):
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
+        self.portals = pg.sprite.Group()
         #for row, tiles in enumerate(self.map.data):
             #for col, tile in enumerate(tiles):
                 #if tile == '1':
@@ -42,16 +44,18 @@ class Game:
         for tile_object in self.map.tmxdata.objects:
             if tile_object.name == 'player':
                 self.player = Player(self, tile_object.x, tile_object.y)
+            if tile_object.name == 'TPZone':
+                # tile_object.properties['level'])
+                Portals(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, tile_object.properties)
             if tile_object.name == 'Wall':
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
         self.camera = Camera(self.map.width, self.map.height)
 
-    def new_level(self):
-        print("Hello")
+    def new_level(self, map_file='Door1.tmx'):
         game_folder = path.dirname(__file__)
         image_folder = path.join(game_folder, 'images')
         map_folder = path.join(game_folder, 'maps')
-        self.map = TiledMap(path.join(map_folder, 'Door1.tmx'))
+        self.map = TiledMap(path.join(map_folder, map_file))
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
 
@@ -71,7 +75,14 @@ class Game:
 
     def update(self):
         #update portion of the game loop
+        pp = pprint.PrettyPrinter(depth=1000)
         self.all_sprites.update()
+        for portal in sprite.spritecollide(self.player, self.portals, False):
+            level = portal.properties['level']
+            print(level)
+            self.new_level(map_file="Door%s.tmx" % level)
+            self.new()
+
         self.camera.update(self.player)
 
     def draw_grid(self):
@@ -108,7 +119,9 @@ class Game:
 #create the game object
 g = Game()
 g.show_start_screen()
+# don't call the new() method every frame D:
+# That's an object constructor!!
+g.new()
 while True:
-    g.new()
     g.run()
     g.show_go_screen()
