@@ -118,6 +118,19 @@ class Obstacle(pg.sprite.Sprite):
         self.rect.y = y
 
 
+class Portals(pg.sprite.Sprite):
+    def __init__(self, game, x, y, w, h, properties):
+        self.groups = game.portals
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.properties = properties
+        self.rect = pg.Rect(x, y, w, h)
+        self.x = x
+        self.y = y
+        self.rect.x = x
+        self.rect.y = y
+
+
 class Door(pg.sprite.Sprite):
     def __init__(self, game, x, y, w, h):
         self.groups = game.door
