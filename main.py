@@ -18,6 +18,7 @@ class Game:
         self.clock = pg.time.Clock()
         self.load_data()
 
+
     def load_data(self):
         game_folder = path.dirname(__file__)
         image_folder = path.join(game_folder, 'images')
@@ -25,7 +26,8 @@ class Game:
         self.map = TiledMap(path.join(map_folder, 'Tile1.tmx'))
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
-        self.spritesheet = Spritesheet(path.join(image_folder, SPRITESHEET))
+        self.spritesheet = Spritesheet(path.join(image_folder, 'mousie1.png'))
+
 
 
     def new(self):
@@ -37,8 +39,21 @@ class Game:
                     #Wall(self, col, row)
                 #if tile == 'P':
                     #self.player = Player(self, col, row)
-        self.player = Player(self, 5, 5)
+        for tile_object in self.map.tmxdata.objects:
+            if tile_object.name == 'player':
+                self.player = Player(self, tile_object.x, tile_object.y)
+            if tile_object.name == 'Wall':
+                Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
         self.camera = Camera(self.map.width, self.map.height)
+
+    def new_level(self):
+        print("Hello")
+        game_folder = path.dirname(__file__)
+        image_folder = path.join(game_folder, 'images')
+        map_folder = path.join(game_folder, 'maps')
+        self.map = TiledMap(path.join(map_folder, 'Door1.tmx'))
+        self.map_img = self.map.make_map()
+        self.map_rect = self.map_img.get_rect()
 
     def run(self):
         #game loop - set self.playing = False to end the game
@@ -48,6 +63,7 @@ class Game:
             self.events()
             self.update()
             self.draw()
+
 
     def quit(self):
         pg.quit()
@@ -67,7 +83,7 @@ class Game:
     def draw(self):
         #self.screen.fill(BGCOLOR)
         self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
-        #self.draw_grid()
+                #self.draw_grid()
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
         pg.display.flip()
@@ -86,6 +102,7 @@ class Game:
 
     def show_go_screen(self):
         pass
+
 
 
 #create the game object
