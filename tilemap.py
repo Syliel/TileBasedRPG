@@ -5,7 +5,7 @@ from pytmx.util_pygame import load_pygame
 import pygame as pg
 from settings import *
 
-class Map1:
+class Map:
     def __init__(self, filename):
         self.data = []
         with open(filename, 'rt') as f:
