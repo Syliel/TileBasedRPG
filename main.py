@@ -29,6 +29,10 @@ class Game:
         self.map_rect = self.map_img.get_rect()
         self.spritesheet = Spritesheet(path.join(image_folder, 'mousie1.png'))
 
+    def player_location(self):
+        self.all_sprites = pg.sprite.Group()
+        self.walls = pg.sprite.Group()
+        self.portals = pg.sprite.Group()
 
 
     def new(self):
@@ -44,20 +48,24 @@ class Game:
         for tile_object in self.map.tmxdata.objects:
             if tile_object.name == 'player':
                 self.player = Player(self, tile_object.x, tile_object.y)
-            if tile_object.name == 'TPZone':
+            if tile_object.name == 'Door':
                 # tile_object.properties['level'])
                 Portals(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height, tile_object.properties)
             if tile_object.name == 'Wall':
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
+
         self.camera = Camera(self.map.width, self.map.height)
 
-    def new_level(self, map_file='Door1.tmx'):
+    def new_level(self, filename):
         game_folder = path.dirname(__file__)
         image_folder = path.join(game_folder, 'images')
         map_folder = path.join(game_folder, 'maps')
-        self.map = TiledMap(path.join(map_folder, map_file))
+        self.map = TiledMap(path.join(map_folder, filename))
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
+        self.all_sprites = pg.sprite.Group()
+        self.walls = pg.sprite.Group()
+        self.portals = pg.sprite.Group()
 
     def run(self):
         #game loop - set self.playing = False to end the game
@@ -74,14 +82,20 @@ class Game:
         sys.exit()
 
     def update(self):
-        #update portion of the game loop
-        pp = pprint.PrettyPrinter(depth=1000)
+        #update portion of the game loo
         self.all_sprites.update()
         for portal in sprite.spritecollide(self.player, self.portals, False):
             level = portal.properties['level']
-            print(level)
-            self.new_level(map_file="Door%s.tmx" % level)
-            self.new()
+            if level == "1":
+
+                self.new_level("Door1.tmx")
+                self.new()
+            if level == '2':
+                self.new_level("Door3.tmx")
+                self.new()
+            if level == 'main':
+                self.load_data()
+                self.new()
 
         self.camera.update(self.player)
 
